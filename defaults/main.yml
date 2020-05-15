@@ -1,15 +1,15 @@
-# installation files source 
+# installation files source
 mssql_installation_source: https://go.microsoft.com/fwlink/?linkid=853016
 
 # Path to download installation media to
-mssql_installation_path: C:\SQLInstall
+mssql_installation_path: C:\Ansible\mssql
 
 # Temporary path to store downloader
-mssql_temp_download_path: C:\tmp
+mssql_temp_download_path: C:\Ansible\tmp
 
 # instance details
 mssql_instance_name: Test
-mssql_drive: C
+mssql_drive: D
 mssql_userdbvol_name: Userdbvol01
 mssql_port: 1433
 
@@ -23,7 +23,7 @@ mssql_max_server_memory: 1024
 # Memory to reserve to the OS
 mssql_os_memory_reservation: 512
 
-# Total system memory 
+# Total system memory
 mssql_total_system_memory: "{{ mssql_max_server_memory + mssql_os_memory_reservation }}"
 
 # Suppress reboots that may occur during SQL Setup tasks
@@ -32,18 +32,17 @@ mssql_suppress_reboot: False
 
 ### Service Accounts ###
 
-mssql_base_ldap_path: "cn=Users,dc=CONTOSO,dc=com"
-domain_controller: dc01
+mssql_base_ldap_path: "OU=COM,DC=corp,DC=organziation,DC=com"
 
 # SQL Service Account
 # regex statements used in some steps expect the format of CONTOSO\
 # do not use @CONTOSO.com for these accounts as SQL install will fail
-mssql_sqlsvc_account: CONTOSO\sql_svc
+mssql_sqlsvc_account: ORG\sqlsv
 mssql_sqlsvc_account_pass: MyPlainTextPassWord01
 
 # SQL Agent Service Account
-mssql_agentsvc_account: CONTOSO\sql_agt
-mssql_agentsvc_account_pass: MyPlainTextPassWord01
+mssql_agentsvc_account: "{{ mssql_sqlsvc_account }}"
+mssql_agentsvc_account_pass: "{{ mssql_sqlsvc_account_pass }}"
 
 # SQL Analysis Services Account
 mssql_assvc_account: "{{ mssql_sqlsvc_account }}"
@@ -61,14 +60,14 @@ mssql_installshared_path: C:\Program Files\Microsoft SQL Server
 mssql_installsharedwow_path: C:\Program Files (x86)\Microsoft SQL Server
 
 # instance path
-mssql_instance_path: "C:\\Program Files\\Microsoft SQL Server\\{{ mssql_instance_name }}"
+mssql_instance_path: "D:\\SQL Server\\instances\{{ mssql_instance_name }}"
 
 # SQL DB and Logging Paths
 mssql_sqlinstalldata_path: "{{ mssql_db_accesspath }}\\{{mssql_instance_name }}"
 mssql_sqluserdata_path: "{{ mssql_db_accesspath }}\\{{mssql_instance_name }}"
 mssql_sqluserlog_path: "{{ mssql_logs_accesspath }}\\{{mssql_instance_name }}"
-mssql_sqltempDB_path: "C:\\TempDBFiles\\Data\\{{mssql_instance_name }}"
-mssql_sqltempDBlog_path: "C:\\TempDBFiles\\Log\\{{mssql_instance_name }}"
+mssql_sqltempDB_path: "D:\\SQL Server\\TempDBFiles\\Data\\{{mssql_instance_name }}"
+mssql_sqltempDBlog_path: "D:\\SQL Server\\TempDBFiles\\Log\\{{mssql_instance_name }}"
 
 # security mode - SQL indicates mixed-mode auth, while Windows indicates Windows Auth.
 mssql_security_mode: sql
@@ -80,12 +79,12 @@ mssql_sa_password: "{{ mssql_sqlsvc_account_pass }}"
 
 # features - Comma seperated list of features to be installed
 #
-# example:   
+# example:
 # mssql_features: SQLENGINE,AS
-# 
+#
 # The list of features below is untested, some may not work with DSC
 #
-# Features list: 
+# Features list:
 #
 # Database engine = SQLENGINE
 # Replication = REPLICATION
@@ -108,9 +107,9 @@ mssql_sa_password: "{{ mssql_sqlsvc_account_pass }}"
 # Distributed replay client = DREPLAY_CLT
 # SQL client connectivity SDK = SNAC_SDK
 # Master data services = MDS
-# ADVANCEDANALYTICS 	Installs R Services, requires the database engine. Unattended installations require /IACCEPTROPENLICENSETERMS parameter.   
+# ADVANCEDANALYTICS 	Installs R Services, requires the database engine. Unattended installations require /IACCEPTROPENLICENSETERMS parameter.
 
-mssql_features: SQLENGINE,FULLTEXT,CONN
+mssql_features: SQLENGINE,CONN
 
 # Collation
 mssql_collation: SQL_Latin1_General_CP1_CI_AS
@@ -121,24 +120,23 @@ mssql_browsersvc_mode: Automatic
 
 # Default Account Access
 # Ansible_Admin must be included so that the playbook can make configuration changes post install
-mssql_sysadmin_accounts: 
-  - CONTOSO\Domain Admins
-  - CONTOSO\Administrator
+mssql_sysadmin_accounts:
+  - CORP\Administrators
 
 # Analysis Services Admins (if installed)
 mssql_asadmin_accounts: "{{ mssql_sysadmin_accounts }}"
 
 # Tuning options
 
-# When an instance of SQL Server runs on a computer that has more than one microprocessor or CPU, 
-# it detects the best degree of parallelism, that is, the number of processors employed to run a single statement, 
-# for each parallel plan execution. You can use the max degree of parallelism option to limit the number of processors 
-# to use in parallel plan execution. 
+# When an instance of SQL Server runs on a computer that has more than one microprocessor or CPU,
+# it detects the best degree of parallelism, that is, the number of processors employed to run a single statement,
+# for each parallel plan execution. You can use the max degree of parallelism option to limit the number of processors
+# to use in parallel plan execution.
 #
-# If the affinity mask option is not set to the default, it may restrict the number of processors available to 
-# SQL Server on symmetric multiprocessing (SMP) systems. 
+# If the affinity mask option is not set to the default, it may restrict the number of processors available to
+# SQL Server on symmetric multiprocessing (SMP) systems.
 #
-# To enable the server to determine the maximum degree of parallelism, set this option to 0, the default value. 
+# To enable the server to determine the maximum degree of parallelism, set this option to 0, the default value.
 #
 # See: https://docs.microsoft.com/en-us/sql/database-engine/configure-windows/configure-the-max-degree-of-parallelism-server-configuration-option
 mssql_max_degree_of_parallelism: 0
@@ -150,10 +148,10 @@ mssql_max_degree_of_parallelism: 0
 # see: Optimizing Server Performance Using Memory Configuration Options
 # https://technet.microsoft.com/en-us/library/ms177455(v=sql.105).aspx
 #
-# The min server memory server configuration option can be used to ensure that 
-# SQL Server does not release memory below the configured minimum server memory 
-# once that threshold is reached. This configuration option can be set to a specific value 
-# based on the size and activity of your SQL Server. If you choose to set this value, 
-# set it to some reasonable value to ensure that the operating system does not request too 
+# The min server memory server configuration option can be used to ensure that
+# SQL Server does not release memory below the configured minimum server memory
+# once that threshold is reached. This configuration option can be set to a specific value
+# based on the size and activity of your SQL Server. If you choose to set this value,
+# set it to some reasonable value to ensure that the operating system does not request too
 # much memory from SQL Server, which can affect SQL Server performance.
 mssql_min_server_memory: 0
