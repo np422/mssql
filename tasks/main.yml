@@ -72,7 +72,7 @@
 
 - name: Create download directory
   win_file:
-    path: "{{ mssql_installation_source }}"
+    path: "{{ mssql_temp_download_path }}"
     state: directory
 
 - name: Create install source directory
