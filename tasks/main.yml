@@ -77,7 +77,7 @@
 
 - name: Create install source directory
   win_file:
-    path: "{{ mssql_installation_path }}"
+    path: "{{ mssql_installation_source }}"
     state: directory
 
 - name: Fetch SQL Media Downloader
